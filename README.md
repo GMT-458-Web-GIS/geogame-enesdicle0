@@ -1,82 +1,67 @@
 # GMT 458 - Assignment 2: GeoGame Design
 ## Project Title: "Geo-Dash" 🌍
 
-This document outlines the design, features, and technical stack for the "Geo-Dash" game, fulfilling the "Design of the geo-game" requirement.
+### Project Objective
+This document outlines the detailed design, features, and technical stack for the "Geo-Dash" game. This game is developed as the primary project for the **GMT 458 - Web GIS** course, designed to demonstrate proficiency in web mapping libraries (Leaflet.js) and asynchronous JavaScript to create a fully interactive web application.
 
-### 1. Game Concept & Requirements
+---
 
-"Geo-Dash" is a fast-paced geography game where players race against a 60-second clock to correctly identify as many countries as possible on an interactive world map.
+### 1. Game Concept & Core Requirements
 
-**Core Features (Requirements):**
-* **Time Limit:** The game must feature a 60-second countdown timer.
-* **Core Mechanic:** Players will be given a country name and must click on that country on the map.
-* **Scoring:** Each correct guess awards +1 point. The objective is to achieve the highest score possible before the time expires.
-* **Data Source:** A GeoJSON file will be used for country borders and names.
-* **Hosting:** The completed application will be hosted as a GitHub Pages site.
+"Geo-Dash" is a fast-paced, "beat-the-clock" geography game. Players are challenged to correctly identify as many countries as possible on an interactive world map within a 60-second time limit.
+
+**Core Requirements:**
+* **Time-Based Challenge:** The game must be built around a 60-second countdown timer, which serves as the primary game mechanic.
+* **Interactive Map:** The core UI component must be a full-screen interactive map (powered by Leaflet.js).
+* **Core Game Loop:** The game will provide a country name (the "Target"), and the user must click on that country's polygon on the map.
+* **Scoring System:** Each correct guess awards +1 point. The objective is to maximize the score before the time expires.
+* **Data Source:** A `countries.geojson` file will be used to provide the geographic boundaries and country name data.
+* **Hosting:** The final, completed application will be deployed and hosted live using GitHub Pages.
+
+**Target Audience:**
+* Casual players, students, or anyone interested in a quick and fun test of their world geography knowledge.
 
 ---
 
 ### 2. Frontend Layout & UI/UX Flow
 
-The interface will be minimalist and clean to keep the player focused on the game, not on distracting UI elements.
+The interface will be minimalist and clean ("minimal-distraction design"). The focus must remain entirely on the map and the core game elements (Target, Time, Score).
 
-**User Flow:**
+**UI Component Breakdown:**
+1.  **Header Bar:** A static bar at the top of the screen displaying the three key pieces of game state information.
+    * `Target: [COUNTRY NAME]`
+    * `Time: 60`
+    * `Score: 0`
+2.  **Map Container:** A full-page container (`<div>`) holding the Leaflet map instance. This will occupy the majority of the viewport.
+3.  **Modals (Pop-ups):**
+    * **Start Modal:** A welcome screen with the game title and a "Start Game!" button.
+    * **End Modal:** A game-over screen that appears when the timer hits 0, displaying the "Final Score" and a "Play Again?" button.
 
-1.  **Start Screen:**
-    * The game title ("Geo-Dash") and a brief "How to Play" description.
-    * A large "Start Game!" button to initiate the session.
+**User Flow (UX):**
+1.  **On Load (Start Screen):** The user is greeted with the "Start Modal." In the background, the Leaflet map and the `countries.geojson` data are pre-loaded to ensure the game starts instantly when the button is clicked.
+2.  **Game Start (Active Screen):** The user clicks "Start Game!":
+    * The Start Modal fades out.
+    * The Header Bar (Score, Time, Target) becomes visible.
+    * The 60-second timer begins its countdown.
+    * The first random target country is fetched and displayed.
+3.  **Game Over (End Screen):** When the timer reaches 0:00:
+    * All map click interactions are immediately disabled to prevent further guesses.
+    * The "End Modal" fades in, displaying the Final Score.
+    * Clicking "Play Again?" resets the timer, score, and re-starts the game loop.
 
-2.  **Game Screen:**
-    * **Header Bar:**
-        * `Target: [COUNTRY NAME]` (The current objective).
-        * `Time: 60` (A countdown timer that will turn red as it gets low).
-        * `Score: 0` (The real-time score).
-    * **Map Container:**
-        * An interactive, clickable map container occupying ~80% of the screen.
+**Layout Sketch (Wireframe):**
+*A simple text-based wireframe for the main "Game Screen" is included below.*
 
-3.  **End Screen:**
-    * When the timer hits 0, a modal (pop-up) window will appear over the map.
-    * It will display a "Time's Up!" title.
-    * "Your Final Score: [SCORE]"
-    * A "Play Again?" button to restart the game.
-
-**Layout Sketch:**
-*A simple wireframe for the main "Game Screen" is included below to visualize the layout.*
-
-[YOUR SKETCH/DRAWING GOES HERE]
-*(You need to add a simple drawing here. You can make it in Paint or draw it on paper and add a photo. Just show simple boxes for the Header, Map, etc.)*
-
----
-
-### 3. Game Mechanics (Answers to Assignment Questions)
-
-This section directly answers the specific questions from the assignment brief.
-
-#### How the game will progress?
-The game is a single 60-second "sprint". There is no difficulty level; the challenge comes from the player's own speed and geographic knowledge.
-* When the game starts, a random country name is displayed (`Target: Brazil`).
-* The player clicks the map.
-* **On Correct Guess:** If the click is within that country's GeoJSON polygon:
-    * `Score` is incremented by +1.
-    * A brief visual confirmation (e.g., a green checkmark) appears.
-    * A new random country is immediately selected (`Target: Australia`).
-* **On Incorrect Guess:** If the click is on the wrong country:
-    * `Score` does not change.
-    * A brief visual error (e.g., a red "X") appears on the clicked spot.
-    * The player must continue trying to find the **same target country**.
-
-#### How many questions will there be?
-There is an **unlimited** number of questions. The game continuously serves new random countries until the timer expires. Success is measured by how many correct answers can be "dashed" through in 60 seconds.
-
-#### How many lives, if any?
-There are **no lives**. The penalty for a wrong guess is not losing a life, but **losing time**. The player cannot advance to the next question (and next point) until they find the correct country, forcing them to spend precious seconds on their mistake.
-
----
-
-### 4. JavaScript Library Selection
-
-#### State which JS library you are planning to use.
-* **Core Map Library: `Leaflet.js`**
-    * **Reason:** Leaflet is a lightweight, easy-to-use, and well-documented library. It is perfect for this project's needs, which are primarily: loading a GeoJSON layer, styling it, and handling `on-click` events to identify features.
-* **Bonus Library (Potential): `Chart.js`**
-    * **Reason:** If the core game mechanics are completed with time to spare, I plan to use `Chart.js` as a bonus feature. On the "End Screen," it could display a simple donut chart summarizing the player's performance (e.g., "15 Correct Clicks" vs. "5 Incorrect Clicks"). This would demonstrate the use of an advanced data visualization package.[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/BhShQpq1)
+```text
++-----------------------------------------------------------------+
+| [Target: COUNTRY NAME]  |  [Time: 60]  |  [Score: 0]           |
++-----------------------------------------------------------------+
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                  [ M A P   C O N T A I N E R ]                  |
+|                       (Leaflet.js Map)                          |
+|                                                                 |
+|                                                                 |
+|                                                                 |
++-----------------------------------------------------------------+
